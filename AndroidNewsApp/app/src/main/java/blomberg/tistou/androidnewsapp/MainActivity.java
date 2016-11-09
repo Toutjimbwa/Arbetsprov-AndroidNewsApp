@@ -1,6 +1,8 @@
 package blomberg.tistou.androidnewsapp;
 
 import android.os.AsyncTask;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,12 +18,12 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
 
-    private static final String NEWS_DEBUG_TAG = "DEBUGNEWS";
+    private static final String DEBUG_NEWS_TAG = "debugNews";
     private static final String JSON_NEWS_URL = "https://dl.dropboxusercontent.com/u/277040683/payload.json";
 
-    private static ArrayList<NewsItem> newsItemArray;
+    public static ArrayList<NewsItem> newsItemArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,17 @@ public class MainActivity extends AppCompatActivity {
         GetJsonNews getJsonNews = new GetJsonNews();
         getJsonNews.execute(JSON_NEWS_URL);
 
+        createItemFragment();
+    }
 
+    private void createItemFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        ItemFragment itemFragment = new ItemFragment();
+        transaction.add(R.id.ACTIVITY_MAIN_RELATIVE_LAYOUT, itemFragment);
+        transaction.addToBackStack(null);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.commit();
     }
 
     @Override
@@ -66,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
 
             //Create URL
-            try{
+            try {
                 url = new URL(params[0]);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -98,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 String inputLine;
                 StringBuffer strBuff = new StringBuffer();
 
-                while((inputLine = buffR.readLine()) != null){
+                while ((inputLine = buffR.readLine()) != null) {
                     strBuff.append(inputLine);
                 }
                 buffR.close();
@@ -115,8 +127,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             newsItemArray = JsonNewsConverter.JsonToNewsItems(s);
-            Log.e(NEWS_DEBUG_TAG, newsItemArray.get(0).getTitle());
-            Log.e(NEWS_DEBUG_TAG, newsItemArray.get(newsItemArray.size()-1).getTitle());
+            Log.e(DEBUG_NEWS_TAG, newsItemArray.get(0).getTitle());
+            Log.e(DEBUG_NEWS_TAG, newsItemArray.get(newsItemArray.size() - 1).getTitle());
         }
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
+        Log.e(DEBUG_NEWS_TAG, "onFragmentInteraction id:" + id);
     }
 }
