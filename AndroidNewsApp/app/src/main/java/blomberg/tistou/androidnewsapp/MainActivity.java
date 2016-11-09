@@ -1,16 +1,33 @@
 package blomberg.tistou.androidnewsapp;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener{
+
+    private static final String DEBUG_NEWS_TAG = "debugNews";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        createItemFragment();
+    }
+
+    private void createItemFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        ItemFragment itemFragment = new ItemFragment();
+        transaction.add(R.id.ACTIVITY_MAIN_RELATIVE_LAYOUT, itemFragment);
+        transaction.addToBackStack(null);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.commit();
     }
 
     @Override
@@ -33,5 +50,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
+        Log.e(DEBUG_NEWS_TAG, "onFragmentInteraction id:" + id);
     }
 }
